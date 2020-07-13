@@ -95,7 +95,6 @@ void colorSelectorPanel(){
 }
 
 color selectColor(int x, int y){
-  println(x);
   int idx = (x/80)*colors.length/2 + y/50-5;
   return colors[idx];
 }
@@ -111,7 +110,6 @@ void mousePressed(){
   if( y >= firstButtonLoc && //TODO: fix condition to simpiler
       y <= firstButtonLoc+8*30+7*20 && 
      (x >= 20 && x <= 50 || x >= 80 && x <= 110)) {
-       println("yeet");
     currentColor = selectColor(x-(x%60)+20, y-y%50);
   }
   
