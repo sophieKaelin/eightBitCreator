@@ -1,0 +1,141 @@
+PrintWriter output;
+int size = 10; //grid size
+color currentColor = #FFFFFF;
+int firstButtonLoc; //y location of first colour button
+color[] colors = {
+  color(255,0,0),     //0: red
+  color(255,127,0),   //1: orange
+  color(255,255,0),   //2: yellow
+  color(0,255,0),     //3: light green
+  #008000,            //4: dark green
+  color(0,255, 255),  //5: light blue
+  color(0,127,255),   //6: medium blue
+  color(0, 0, 255),   //7: dark blue
+  color(127,0,255),   //8: purple
+  color(255,0,255),   //9: pink
+  color(255,0,127),   //10: dark pink
+  color(255),         //11: white
+  color(0),           //12: black
+  color(125),         //13: grey
+  #FFDBAC,            //14: light skin color
+  #8D5524,            //15: dark skin color
+  }; //TODO add more colours.
+
+void initialiseFile(){
+ output.println("void setup(){");
+ output.print("\ts"); 
+ output.println("ize(800,800);"); //TODO: Fix bug that wont let "size()" be written to file
+ output.println("\tbackground(255);"); 
+ output.println("\tnoStroke();");
+ output.println("\tdrawCharacter(width/2, height/2);\n}");
+ output.println("\nvoid drawCharacter(int x, int y){"); 
+}
+
+void setup(){
+  output = createWriter("characterCode.txt");
+  size(800,800);
+  background(255);
+  firstButtonLoc = height/4+50;
+  drawGrid();
+  colorSelectorPanel();
+  initialiseFile();
+}
+
+void draw(){
+}
+
+void drawGrid(){
+  stroke(205);
+  noFill();
+  for(int x = 0; x < 800; x+= size){
+    for(int y = 0; y < 800; y+= size){
+      rect(x, y, size, size);
+    }    
+  }
+}
+
+void colorSelectorPanel(){
+  fill(255);
+  strokeWeight(3);
+  stroke(0);
+  rect(0, height/4, width/4, 3*height/5); //base for panel
+  /*old loops */
+  //for(int i = 0; i < colors.length/2; i++){ //first col
+  //  fill(colors[i]);
+  //  rect(20, firstButtonLoc+i*50, 30, 30);
+  //}
+  //for(int i = 0; i < colors.length/2; i++){ //second col
+  //  fill(colors[colors.length/2+i]);
+  //  rect(80, firstButtonLoc+i*50, 30, 30);
+  //}
+  for(int i = 0; i < colors.length; i++){
+    fill(colors[i]);
+    if(i >= colors.length/2){
+      rect(80, firstButtonLoc+(i-8)*50, 30, 30);
+    }
+    else {
+      rect(20, firstButtonLoc+i*50, 30, 30);
+    }
+  }
+  
+  //reset button
+  fill(0);
+  stroke(100);
+  strokeWeight(2);
+  rect(20, 640, 70, 30);
+  fill(255);
+  text("CLEAR", 40, 660);
+  
+  //save button
+  fill(0);
+  rect(95, 640, 70, 30);
+  fill(255);
+  text("SAVE", 115, 660);
+  strokeWeight(1);
+}
+
+color selectColor(int x, int y){
+  println(x);
+  int idx = (x/80)*colors.length/2 + y/50-5;
+  return colors[idx];
+}
+
+void mousePressed(){
+  int x = mouseX - (mouseX % size);
+  int y = mouseY - (mouseY % size);
+  if(mouseX > width/4){ //if in the drawing section
+    drawCube(x, y);
+  }
+  
+  //if in the colour selecting panel
+  if( y >= firstButtonLoc && //TODO: fix condition to simpiler
+      y <= firstButtonLoc+8*30+7*20 && 
+     (x >= 20 && x <= 50 || x >= 80 && x <= 110)) {
+       println("yeet");
+    currentColor = selectColor(x-(x%60)+20, y-y%50);
+  }
+  
+  //reset button
+  if(x >= 20 && x<=90 && y >=640 && y <=670){
+    setup();
+  }
+  
+  //save button
+  if(x >= 95 && x<=165 && y >=640 && y <=670){
+    output.println("}");
+    output.flush();
+    output.close();
+    exit();
+  }  
+}
+
+void drawCube(int x, int y){
+  noStroke();
+  fill(currentColor);
+  rect(x, y, size, size); 
+  //write it to file.
+  String hexCode = String.format("%x", currentColor); //covert to simplified hexcode
+  hexCode = "#" + hexCode.substring(2);
+  output.println("fill("+hexCode+");");
+  output.println("rect("+x+","+ y+",10,10);");
+}
