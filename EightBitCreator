@@ -81,7 +81,7 @@ void colorSelectorPanel() {
     }
   }
 
-  //reset button
+  //reset button TODO: doesn't clear the code yet
   fill(0);
   stroke(100);
   strokeWeight(2);
@@ -114,6 +114,12 @@ void mousePressed() {
     y <= firstButtonLoc+8*30+7*20 && 
     (x >= 20 && x <= 50 || x >= 80 && x <= 110)) {
     currentColor = selectColor(x-(x%60)+20, y-y%50);
+    
+    //print the new color to file
+    String hexCode = String.format("%x", currentColor); //covert to simplified hexcode
+    hexCode = "#" + hexCode.substring(2);
+    output.println("\tfill("+hexCode+");");
+    
   }
 
   //reset button
@@ -142,8 +148,6 @@ void drawCube(int x, int y) {
 }
 
 void writeCubeToFile(int x, int y){
-  String hexCode = String.format("%x", currentColor); //covert to simplified hexcode
-  hexCode = "#" + hexCode.substring(2);
   String rectCode = "\trect(x+" + x + ",y+" + y + ",10,10);";
   while (rectCode.indexOf("+-") != -1) { //TODO: find better alternative for replaceAll()
     int idx = rectCode.indexOf("+-");
@@ -157,6 +161,5 @@ void writeCubeToFile(int x, int y){
     int idx = rectCode.indexOf("+0");
     rectCode = rectCode.substring(0, idx) + rectCode.substring(idx+2);
   }
-  output.println("\tfill("+hexCode+");");
   output.println(rectCode);
 }
